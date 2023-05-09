@@ -1,6 +1,6 @@
 export const DBConfig = {
-    name: 'notesDB',
-    version: 1,
+    name: 'notesData',
+    version: 10,
     objectStoresMeta: [
       {
         store: 'notes',
