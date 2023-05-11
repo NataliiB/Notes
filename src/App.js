@@ -1,78 +1,59 @@
-import React from "react";
-import "./App.css";
-import SearchBox from "./SearchBox/SearchBox";
-import Sidebar from "./Sidebar/Sidebar";
-import ListItem from "./ListItem/ListItem";
+
 import Workspace from "./Workspace/Workspace";
+import Sidebar from "./Sidebar/Sidebar.jsx";
+import SearchBox from "./SearchBox/SearchBox.jsx";
+import { db } from "./db";
+import { useLiveQuery } from "dexie-react-hooks";
+import NotesList from "./NotesList/NotesList";
+import { createContext } from 'react';
 
-import { initDB } from "react-indexed-db";
-import { IndexedDB } from "react-indexed-db";
-import { indexedDBSupport } from "react-indexed-db";
-import { DBConfig } from "./DBConfig";
-initDB(DBConfig);
-const indexedDB = window.indexedDB;
-const request = indexedDB.open("notesData", 10);
-let db;
+export const NotesContext = createContext({});
 
-request.onupgradeneeded = (e) => {
-  db = e.target.result;
-  const store = db.createObjectStore("notes", { keyPath: "id" });
-
-  store.createIndex("textNote", ["textNote"], { unique: false });
-  store.createIndex("date", ["date"], { unique: false });
-  
-  //...
-};
-
-request.onsuccess = function (event) {
-  db = request.result;
-  const transaction = db.transaction(["notes"], "readwrite");
-  const store = transaction.objectStore("notes");
-
-  const textNote = store.index("textNote");
-  const date = store.index("date");
-  store.put({ id: 0, textNote: "ftykghsdrjkflgh", date: new Date() });
-  store.put({ id: 1, textNote: "hczsjkcozsd", date: new Date() });
-  store.put({ id: 2, textNote: "!!!FTHJ", date: new Date() }); 
-
-}
-function getAllNotes() {
-  request.onsuccess=()=>{
-      
-  console.log("!!!!!!!!!!!!!!")
-  db = request.result;
-  const tx = db.transaction(["notes"], "readonly");
-  const notesStore = tx.objectStore("notes");
-  console.log(notesStore);
-  return notesStore.getAll()
-
-
+const App = (props) => {
+  console.log(props)
+  let isFinished = false;
+  async function addNote(inputTextNote) {
+    try {
+      // Add the new friend!
+      const id = await db.notes.add({
+        inputTextNote,
+        createdAt: new Date(),
+      });
+    } catch (error) {
+      console.log(`Failed to add note ${error}`);
+    }
   }
+  const notesList = useLiveQuery(() => db.notes.toArray());
 
-}
-getAllNotes();
-function addNote(note) {
-  request.onsuccess = function () {
-    db = request.result;
-    const transaction = db.transaction(["notes"], "readwrite");
-    const store = transaction.objectStore("notes");
-    store.add({ id: 14, textNote: note, date: new Date() });
-  };
-}
+  
+  let noteToDel
 
-const App = () => {
+function giveNoteToDelete(note){
+  console.log(note)
+  noteToDel=note;
+  console.log(noteToDel)
+  return noteToDel;
+}
+function deleteNote(){
+    
+  db.notes.where('id').equals(noteToDel.id).delete()
+
+    }
+
   return (
     <>
+    <NotesContext.Provider value={{deleteNote, addNote,notesList}}>
       <div className="App">
         <div className="navbar">
-          <Sidebar addNote={addNote} />
+          <Sidebar addNote={addNote} deleteNote={deleteNote} />
           <SearchBox />
         </div>
         <div className="container">
-          <ListItem />
+          <NotesList notesList={notesList} isFinished={isFinished} noteToDelete={giveNoteToDelete}/>
           <Workspace />
         </div>
       </div>
+      </NotesContext.Provider>
     </>
   );
 };
