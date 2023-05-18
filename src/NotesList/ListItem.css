@@ -1,0 +1,5 @@
+button.yt-icon-button:focus {
+    vertical-align: middle;
+    color: #01a715;
+}
+button:focus{outline:0}

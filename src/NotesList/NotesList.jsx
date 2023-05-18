@@ -7,7 +7,7 @@ const NotesList = (props) => {
   console.log(value)
   return (
   <>
-    {value.notesList?.map((note) => <ListItem note={note} isFinished={props.isFinished} noteToDelete={props.noteToDelete} />)}
+    {value.notesList?.map((note) => <ListItem note={note} isFinished={props.isFinished} noteToDelete={props.noteToDelete} getActiveNote={props.getActiveNote}/>)}
   </>
  )
 }
