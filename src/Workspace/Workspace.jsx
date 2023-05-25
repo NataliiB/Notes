@@ -3,14 +3,21 @@ import React, { useState } from "react";
 import { NotesContext } from "../App";
 
 
+
 const Workspace =(props)=>{
     const value=React.useContext(NotesContext);
+    
+    let [updatedNote,setUpdatedNote] = useState(props.activeNote);
+    
    
-       console.log(props.activeNote)
+      
+
     return(<>
     <div>Workspace</div>
 
-    <input className="workspace" value={props.activeNote} ></input>
+    <textarea className="workspace" defaultValue={value.activeNote.note} onChange={(e)=>setUpdatedNote(e.target.value)}/>
+    
+    <button onClick={()=>value.update(updatedNote)}>Save</button>
     </>)
 }
 export default Workspace;

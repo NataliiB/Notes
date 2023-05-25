@@ -10,6 +10,8 @@ export const NotesContext = createContext({});
 
 const App = (props) => {
   const [activeNote, getActiveNote] = useState("");
+  const [isActive, changeIsActive ] = useState(false);
+  
   console.log(props);
   let isFinished = false;
   async function addNote(note) {
@@ -24,13 +26,13 @@ const App = (props) => {
   }
   const notesList = useLiveQuery(() => db.notes.toArray());
 
-  let noteToDel = "222222222";
+  let noteToDel = " ";
 
   function giveNoteToDelete(note) {
     console.log(note);
     noteToDel = note;
     console.log(noteToDel);
-    getActiveNote(noteToDel.note);
+    getActiveNote(noteToDel);
     return noteToDel;
   }
 
@@ -38,11 +40,10 @@ const App = (props) => {
     let confirming = window.confirm("Delete note?");
     if (confirming) {
       db.notes.where("id").equals(noteToDel.id).delete();
+      changeNote();
     }
   }
-  console.log(noteToDel);
-
-  function changeNote() {}
+  
 
   async function toSearch(searchText) {
     console.log(db.notes);
@@ -54,9 +55,13 @@ const App = (props) => {
       .toArray();
     console.log(result);
   }
-  let isActive = false;
+  
   function changeNote() {
-    isActive = true;
+    changeIsActive(true);
+  }
+  async function update(note) {
+   db.notes.update(activeNote.id,{note:note, createdAt:new Date})
+   console.log(activeNote)
   }
 
   return (
@@ -71,6 +76,7 @@ const App = (props) => {
           activeNote,
           changeNote,
           isActive,
+          update
         }}
       >
         <div className="App">

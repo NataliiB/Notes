@@ -18,7 +18,7 @@ const Sidebar = (props) => {
           onChange={(event) => setInputText(event.target.value)}
         />
         <button onClick={() => props.deleteNote()}>Delete</button>
-        <button onClick={value.changeNote()}>Change</button>
+        <button onClick={()=>value.changeNote()}>Change</button>
       </div>
     </>
   );
